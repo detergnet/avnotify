@@ -99,6 +99,7 @@ def adjust_volume_alsa(args):
     pattern = re.compile("\[(\d+)%\].+?\[(on|off)\]")
     proc = subprocess.Popen(["amixer", "set"] + args, stdout=subprocess.PIPE)
     for line in proc.stdout:
+        line = line.decode()
         if "cvolume" in line.split():
             mic = True
         match = pattern.search(line)
