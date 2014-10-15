@@ -23,11 +23,11 @@ APP_CACHE_NAME = "avnotify"
 TIMEOUT = 5000
 
 
-def send_notification(id, title, text, icon):
+def send_notification(id, title, text, icon, hints=''):
     bus = dbus.SessionBus()
     obj = bus.get_object(DBUS_NOTIF_OBJECT, DBUS_NOTIF_PATH)
     notify = dbus.Interface(obj, DBUS_NOTIF_IFACE)
-    return notify.Notify(APP_NAME, id, icon, title, text, '', '', TIMEOUT)
+    return notify.Notify(APP_NAME, id, icon, title, text, '', hints, TIMEOUT)
 
 
 def ensure_path(path):
@@ -122,7 +122,7 @@ def main(args):
     text = "Volume at %d%%%s" % (level, " (muted)" if muted else "")
     old_id = xdg_read_cache(APP_CACHE_NAME, "previous-id", TIMEOUT) or "0"
     old_id = int(old_id.strip())
-    new_id = send_notification(old_id, title, text, icon)
+    new_id = send_notification(old_id, title, text, icon, dict(value=level))
     xdg_save_cache(APP_CACHE_NAME, "previous-id", new_id)
 
 if __name__ == "__main__":
