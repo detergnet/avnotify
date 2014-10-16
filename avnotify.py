@@ -20,14 +20,14 @@ TITLE_MICROPHONE = "Microphone"
 TITLE_PLAYBACK = "Playback"
 APP_NAME = "Alsa Volume Notifier"
 APP_CACHE_NAME = "avnotify"
-TIMEOUT = 5000
+CACHE_TIMEOUT = 10
 
 
 def send_notification(id, title, text, icon, hints=''):
     bus = dbus.SessionBus()
     obj = bus.get_object(DBUS_NOTIF_OBJECT, DBUS_NOTIF_PATH)
     notify = dbus.Interface(obj, DBUS_NOTIF_IFACE)
-    return notify.Notify(APP_NAME, id, icon, title, text, '', hints, TIMEOUT)
+    return notify.Notify(APP_NAME, id, icon, title, text, '', hints, -1)
 
 
 def ensure_path(path):
@@ -70,7 +70,7 @@ def xdg_save_cache(app_name, key, value):
 
 def xdg_read_cache(app_name, key, timeout=None):
     """Read a value from the application's XDG cache, no older than timeout
-    milliseconds.
+    seconds.
 
     Returns None if the requested key is not found or the timeout
     has passed since the key was saved.
@@ -79,7 +79,7 @@ def xdg_read_cache(app_name, key, timeout=None):
     try:
         with open(path, "rt") as inf:
             tstamp = as_float_default(inf.readline().strip())
-            if timeout and tstamp + (timeout / 1000.0) < time.time():
+            if timeout and tstamp + timeout < time.time():
                 return None
             return inf.read()
     except IOError:
@@ -120,7 +120,7 @@ def main(args):
     title = TITLE_MICROPHONE if mic else TITLE_PLAYBACK
     icon = "%s-%s" % (base, suffix)
     text = "Volume at %d%%%s" % (level, " (muted)" if muted else "")
-    old_id = xdg_read_cache(APP_CACHE_NAME, "previous-id", TIMEOUT) or "0"
+    old_id = xdg_read_cache(APP_CACHE_NAME, "previous-id", CACHE_TIMEOUT) or "0"
     old_id = int(old_id.strip())
     new_id = send_notification(old_id, title, text, icon, dict(value=level))
     xdg_save_cache(APP_CACHE_NAME, "previous-id", new_id)
