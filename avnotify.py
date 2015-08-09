@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# Copyright (c) 2014-2015, Marius Barbu <msb@avengis.com>
+# All rights reserved.
+#
+# Released under BSD 2-Clause. See LICENSE for more information.
+
 from __future__ import print_function
 import sys
 import os
