@@ -114,8 +114,9 @@ def adjust_volume_alsa(args):
 
 def main(args):
     mic, level, muted = adjust_volume_alsa(args)
+    level_index = 1 + min(100, level) // 34
     base = ICON_BASE_MICROPHONE if mic else ICON_BASE_PLAYBACK
-    suffix = ICON_SUFFIXES[0] if muted else ICON_SUFFIXES[1 + level // 34]
+    suffix = ICON_SUFFIXES[0] if muted else ICON_SUFFIXES[level_index]
 
     title = TITLE_MICROPHONE if mic else TITLE_PLAYBACK
     icon = "%s-%s" % (base, suffix)
